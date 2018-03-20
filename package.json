@@ -1,0 +1,25 @@
+{
+  "name": "beerscraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TyPhyter/BeerScraper.git"
+  },
+  "author": "Tyler Jenkins",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TyPhyter/BeerScraper/issues"
+  },
+  "homepage": "https://github.com/TyPhyter/BeerScraper#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cheerio": "^1.0.0-rc.2",
+    "express": "^4.16.3",
+    "request": "^2.85.0"
+  }
+}
