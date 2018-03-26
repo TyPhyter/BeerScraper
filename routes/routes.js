@@ -1,6 +1,7 @@
 var request = require("request");
 var fs = require("fs");
 var cheerio = require("cheerio");
+var testData = require("../sample.json");
 
 var appRouter = function(app) {
 
@@ -8,6 +9,12 @@ var appRouter = function(app) {
         field1: "info",
         field2: "info2"
     }
+
+    app.use(function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        next();
+    });
 
     app.get("/", function(req, res) {
         res.send(data);
@@ -18,38 +25,53 @@ var appRouter = function(app) {
     });
 
     app.get("/scrape", function(req, res) {
-        
-        var url = "https://untappd.com/search?q=dallas%2C+tx&type=venues&sort=all";
-        
-        request(url, function(error, response, html){
-
-            var json = {
-                bars : []
-            };
-
-            if(error){
-                res.send(error);
-            }
-            if(!error){
-                var $ =  cheerio.load(html);
+        //Get search string (cityst) from input field, format to remove commas, replace spaces with "+"
+        //looking for q=CITY+ST
+        if(req.query.q){
+            var url = `https://untappd.com/search?q=${req.query.q}&type=venues&sort=all`;
+            // var url = "https://untappd.com/search?q=dallas%2C+tx&type=venues&sort=all";
             
-                $(".name a").each(function() {
-                    var data = $(this);
+            request(url, function(error, response, html){
+                //console.log(html);
+                //console.log(response);
+                var json = {
+                    bars : []
+                };
 
-                    var barName = data.text();
-                    var href = data.attr("href");
+                if(error){
+                    res.send(error);
+                }
+                if(!error){
+                    var $ =  cheerio.load(html);
+                
+                    $(".name a").each(function() {
+                        var data = $(this);
 
-                    //request venue urls here to get address and beer menu
-                    
-                    json.bars.push({barName: barName, href: href});
+                        var barName = data.text();
+                        var href = data.attr("href");
 
-                });
-            }
-            res.send(json);
-        });
+                        //get venue addresses here
+                        
+                        //turn addresses into coordinates
+                        
+                        json.bars.push({barName: barName, href: href});
 
+                    });
+                }
+                res.send(json);
+            });
+        }
+        //res.send("You visited /scrape");
     });
 
+    app.get("/search", function(req, res) {
+        if(req.query.q === "dallastx"){
+            res.send(testData);
+        } else {
+            res.send(req.query.q);
+        }
+        
+    });
 }
 
 module.exports = appRouter;
